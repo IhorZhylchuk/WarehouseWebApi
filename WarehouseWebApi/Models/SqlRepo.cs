@@ -64,7 +64,6 @@ namespace WarehouseWebApi.Models
             var palletFromDb = await _dbContext.Pallets.Where(n => n.PalletNumber == palletNumber).FirstAsync();
 
             palletFromDb.PalletNumber = pallet.PalletNumber;
-            palletFromDb.NewOrderId = pallet.NewOrderId;
             palletFromDb.Status = pallet.Status;
             palletFromDb.MaterialName = pallet.MaterialName;
             palletFromDb.Ilość = pallet.Ilość;
