@@ -9,8 +9,8 @@ namespace WarehouseWebApi.Interfaces
         Task<PalletModel> GetPalletByNumAsync(long palletNumber);
         Task UpdatePalletAsync(long palletNumber, PalletModel pallet);
         Task DeletePalletAsync(PalletModel pallet);
-        Task<NewOrder> Order(string localizationName, int count, int igredientNumber);
-        Task<List<IEnumerable<PalletModel>>> LocalizationCheck(string machineName);
+        Task<NewOrder>CreateOrderAsync(string localizationName, int count, int igredientNumber);
+        Task<List<IEnumerable<PalletModel>>> LocalizationCheckAsync(string machineName);
         Task SaveChangesAsync();
     }
 }

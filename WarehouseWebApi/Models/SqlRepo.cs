@@ -34,15 +34,15 @@ namespace WarehouseWebApi.Models
             return pallets;
         }
 
-        public async Task<List<IEnumerable<PalletModel>>> LocalizationCheck(string machineName)
+        public async Task<List<IEnumerable<PalletModel>>> LocalizationCheckAsync(string machineName)
         {
-            var pallets = await _dbContext.Machines.Where(n => n.Name == machineName).Select(p => p.Paletts).ToListAsync();
+            var pallets = await _dbContext.Orders.Where(n => n.Localization == machineName).Select(p => p.Paletts).ToListAsync();
             return pallets;
         }
 
-        public async Task<NewOrder> Order(string localizationName, int count, int igredientNumber)
+        public async Task<NewOrder> CreateOrderAsync(string localizationName, int count, int igredientNumber)
         {
-            var pallet = await _dbContext.Pallets.Where(n => n.IngredienNumber == igredientNumber).FirstAsync();
+            var pallet = await _dbContext.Pallets.Where(n => n.IngredienNumber == igredientNumber && n.Status == "Free to use").ToListAsync();
 
             var newOrder = new NewOrder()
             {
@@ -51,6 +51,9 @@ namespace WarehouseWebApi.Models
                 IngredientNumber = igredientNumber,
                 Paletts = DefaultMethods.Pallets(igredientNumber, count, _dbContext),
             };
+            await _dbContext.Orders.AddAsync(newOrder);
+            await _dbContext.SaveChangesAsync();
+
             return newOrder;
         }
 
@@ -63,7 +66,6 @@ namespace WarehouseWebApi.Models
         {
             var palletFromDb = await _dbContext.Pallets.Where(n => n.PalletNumber == palletNumber).FirstAsync();
 
-            palletFromDb.PalletNumber = pallet.PalletNumber;
             palletFromDb.Status = pallet.Status;
             palletFromDb.MaterialName = pallet.MaterialName;
             palletFromDb.Ilość = pallet.Ilość;

@@ -28,6 +28,8 @@ namespace WarehouseWebApi.Controllers
                 try
                 {
                     var pallet = _maper.Map<PalletModel>(dtoPallet);
+                    pallet.Status = "Free to use";
+
                     await _repo.CreatePalletAsync(pallet);
                     await _repo.SaveChangesAsync();
 
@@ -146,6 +148,69 @@ namespace WarehouseWebApi.Controllers
                 }
             }
             return NotFound("Please, make sure you entered correct 'PalletNumber'");
+        }
+
+        [HttpPost("NewOrderCreating")]
+        public async Task<ActionResult<DtoNewOrderModel>> NewOrderCreatingAsync([FromBody] string localizationName, int count, int igredientNumber)
+        {
+            if(localizationName != null && count != 0 && igredientNumber !=0)
+            {
+                try
+                {
+                    var newOrder = await _repo.CreateOrderAsync(localizationName, count, igredientNumber);
+
+                    foreach(var item in newOrder.Paletts)
+                    {
+                        item.Status = "In process";
+                        item.Localization = localizationName;
+                        await _repo.UpdatePalletAsync(item.PalletNumber, item);
+                    }
+
+                    await _repo.SaveChangesAsync();
+                    return Ok(_maper.Map<DtoNewOrderModel>(newOrder));
+                }
+                catch(Exception ex)
+                {
+                    return BadRequest("Some error occured - " + ex.Message.ToString());
+                }
+            }
+            return BadRequest("Make sure you entered all values!");
+        }
+
+        [HttpGet("CheckLocalization")]
+        public async Task<ActionResult<IEnumerable<PalletModel>>> CheckLocalizationAsync(string localization)
+        {
+            if(localization != null)
+            {
+                try
+                {
+                    /*
+                    var check = await _repo.LocalizationCheckAsync(name);
+
+                    var list = new List<Tuple<string, PalletModel>>();
+                    foreach(var item in check)
+                    {
+                        list.Add(new Tuple<string, PalletModel>(item.Select(n => n.Localization).Single(), item.Single()));
+                    }
+                    return Ok(check); */
+                    var allPallets = await _repo.GetPalletsAsync();
+                    var list = new List<PalletModel>();
+                    foreach(var  pallet in allPallets)
+                    {
+                        if(pallet.Localization == localization)
+                        {
+                            list.Add(pallet);
+                        }
+                    }
+                    return Ok(list);
+                }
+                catch(Exception ex)
+                {
+                    return NotFound("Some error occured - " + ex.Message.ToString());
+                }
+            }
+            return NotFound("Make sure you entered correct values!");
+
         }
 
     }

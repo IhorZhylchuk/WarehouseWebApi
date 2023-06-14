@@ -2,7 +2,7 @@
 
 namespace WarehouseWebApi.Dto_Models
 {
-    public class DtoNewOrderModel:NewOrder
+    public class DtoNewOrderModel: DefaultModelForNewOrder
     {
     }
 }

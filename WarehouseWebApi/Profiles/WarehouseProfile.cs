@@ -10,9 +10,7 @@ namespace WarehouseWebApi.Profiles
         {
             CreateMap<PalletModel, DtoPalletModel>();
             CreateMap<DtoPalletModel, PalletModel>();
-            
-
-
+            CreateMap<DefaultModelForNewOrder, DtoNewOrderModel>();
         }
     }
 }
