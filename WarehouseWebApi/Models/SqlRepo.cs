@@ -34,22 +34,23 @@ namespace WarehouseWebApi.Models
             return pallets;
         }
 
-        public async Task<List<IEnumerable<PalletModel>>> LocalizationCheckAsync(string machineName)
+        public async Task<IEnumerable<PalletModel>> LocalizationCheckAsync(string machineName)
         {
-            var pallets = await _dbContext.Orders.Where(n => n.Localization == machineName).Select(p => p.Paletts).ToListAsync();
-            return pallets;
+            var orders = await _dbContext.Pallets.Where(n => n.Localization == machineName).ToListAsync();
+            
+            return orders;
         }
 
         public async Task<NewOrder> CreateOrderAsync(string localizationName, int count, int igredientNumber)
         {
-            var pallet = await _dbContext.Pallets.Where(n => n.IngredienNumber == igredientNumber && n.Status == "Free to use").ToListAsync();
+            var pallets = await _dbContext.Pallets.Where(n => n.IngredienNumber == igredientNumber && n.Status == "Free to use").ToListAsync();
 
             var newOrder = new NewOrder()
             {
                 Count = count,
                 Localization = localizationName,
                 IngredientNumber = igredientNumber,
-                Paletts = DefaultMethods.Pallets(igredientNumber, count, _dbContext),
+                Paletts = DefaultMethods.Pallets(count, pallets),
             };
             await _dbContext.Orders.AddAsync(newOrder);
             await _dbContext.SaveChangesAsync();

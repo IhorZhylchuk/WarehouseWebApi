@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WarehouseWebApi.Attributes;
+using WarehouseWebApi.Interfaces;
 
 namespace WarehouseWebApi.Models
 {

@@ -1,12 +1,13 @@
 ﻿
+using WarehouseWebApi.Interfaces;
+
 namespace WarehouseWebApi.Models
 {
     public static class DefaultMethods
     {
-        public static List<PalletModel> Pallets(int ingredientNumber, int count, ApplicationDbContex dbContex)
+        public static List<PalletModel> Pallets(int count, List<PalletModel> palletsFromDb)
         {
             var totalCount = 0;
-            var palletsFromDb = dbContex.Pallets.Where(n => n.IngredienNumber == ingredientNumber).ToList();
             var newPallets = new List<PalletModel>();
 
             foreach(var p in palletsFromDb)
@@ -20,6 +21,24 @@ namespace WarehouseWebApi.Models
             }
 
             return new List<PalletModel>(newPallets);
+        }
+        public static bool CheckPalletNumber(long palletNumber, ISqlInterface repo)
+        {
+            var result = false;
+            try
+            {
+                var pallet = repo.GetPalletByNumAsync(palletNumber).Result;
+                if (pallet is PalletModel)
+                {
+                    result = true;
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ToString();
+            }
+            return result;
         }
     }
 }

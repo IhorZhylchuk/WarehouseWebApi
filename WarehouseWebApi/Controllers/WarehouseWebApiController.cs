@@ -27,21 +27,29 @@ namespace WarehouseWebApi.Controllers
             {
                 try
                 {
-                    var pallet = _maper.Map<PalletModel>(dtoPallet);
-                    pallet.Status = "Free to use";
+                    var check = DefaultMethods.CheckPalletNumber(dtoPallet.PalletNumber, _repo);
+                    if(check != true)
+                    {
+                        var pallet = _maper.Map<PalletModel>(dtoPallet);
+                        pallet.Status = "Free to use";
+                        pallet.Localization = dtoPallet.Localization.Trim().ToLower();
 
-                    await _repo.CreatePalletAsync(pallet);
-                    await _repo.SaveChangesAsync();
+                        await _repo.CreatePalletAsync(pallet);
+                        await _repo.SaveChangesAsync();
 
-                    var dtoReadPallet = _maper.Map<DtoPalletModel>(pallet);
+                        var dtoReadPallet = _maper.Map<DtoPalletModel>(pallet);
 
-                    return CreatedAtRoute(nameof(GetPalletByNumAsync), new { PalletNumber = pallet.PalletNumber }, dtoReadPallet);
+                        return CreatedAtRoute(nameof(GetPalletByNumAsync), new { PalletNumber = pallet.PalletNumber }, dtoReadPallet);
+
+                    }
+                    return Ok("The pallet with the same number is already in Db!");
                 }
-                catch(Exception ex)
-                {
-                    return NotFound("Some error occured - " + ex.Message.ToString());
+                    catch (Exception ex)
+                    {
+                        return NotFound("Some error occured - " + ex.Message.ToString());
 
-                }
+                    }
+                
             }
             return NotFound("Please, entere correct values!");
         }
@@ -86,7 +94,10 @@ namespace WarehouseWebApi.Controllers
             {
                 try
                 {
-                    await _repo.UpdatePalletAsync(palletNumber, _maper.Map<PalletModel>(dtoPallet));
+                    var pallet = _maper.Map<PalletModel>(dtoPallet);
+                    pallet.Status = _repo.GetPalletByNumAsync(palletNumber).Result.Status;
+
+                    await _repo.UpdatePalletAsync(palletNumber, pallet);
                     await _repo.SaveChangesAsync();
 
                     return Ok(dtoPallet);
@@ -155,54 +166,53 @@ namespace WarehouseWebApi.Controllers
         {
             if(localizationName != null && count != 0 && igredientNumber !=0)
             {
-                try
+                if(!string.Equals(localizationName.Trim(), "string", StringComparison.OrdinalIgnoreCase))
                 {
-                    var newOrder = await _repo.CreateOrderAsync(localizationName, count, igredientNumber);
-
-                    foreach(var item in newOrder.Paletts)
+                    try
                     {
-                        item.Status = "In process";
-                        item.Localization = localizationName;
-                        await _repo.UpdatePalletAsync(item.PalletNumber, item);
-                    }
+                        var newOrder = await _repo.CreateOrderAsync(localizationName, count, igredientNumber);
 
-                    await _repo.SaveChangesAsync();
-                    return Ok(_maper.Map<DtoNewOrderModel>(newOrder));
+                        if (newOrder.Paletts.Count() > 0)
+                        {
+                            foreach (var item in newOrder.Paletts)
+                            {
+                                item.Status = "In process";
+                                item.Localization = localizationName;
+                                await _repo.UpdatePalletAsync(item.PalletNumber, item);
+                            }
+
+                            await _repo.SaveChangesAsync();
+                            return Ok(_maper.Map<DtoNewOrderModel>(newOrder));
+                        }
+                        return NotFound("Please, make sure you entered correct values or may be the pallet has already been used!");
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest("Some error occured - " + ex.Message.ToString());
+                    }
                 }
-                catch(Exception ex)
-                {
-                    return BadRequest("Some error occured - " + ex.Message.ToString());
-                }
+                return NotFound("Please, make sure you entered correct localization!");
             }
             return BadRequest("Make sure you entered all values!");
         }
 
         [HttpGet("CheckLocalization")]
-        public async Task<ActionResult<IEnumerable<PalletModel>>> CheckLocalizationAsync(string localization)
+        public async Task<ActionResult<IEnumerable<PalletModel>>> CheckLocalizationAsync(string enteredLocalization)
         {
-            if(localization != null)
+            if(enteredLocalization != null)
             {
+                var localization = enteredLocalization.Replace("\"", "").Trim().ToLower();
                 try
                 {
-                    /*
-                    var check = await _repo.LocalizationCheckAsync(name);
+                    var list = new List<DtoPalletModel>();
 
-                    var list = new List<Tuple<string, PalletModel>>();
-                    foreach(var item in check)
+                    foreach(var pallet in await _repo.LocalizationCheckAsync(localization))
                     {
-                        list.Add(new Tuple<string, PalletModel>(item.Select(n => n.Localization).Single(), item.Single()));
+                        list.Add(_maper.Map<DtoPalletModel>(pallet));
                     }
-                    return Ok(check); */
-                    var allPallets = await _repo.GetPalletsAsync();
-                    var list = new List<PalletModel>();
-                    foreach(var  pallet in allPallets)
-                    {
-                        if(pallet.Localization == localization)
-                        {
-                            list.Add(pallet);
-                        }
-                    }
+                
                     return Ok(list);
+
                 }
                 catch(Exception ex)
                 {
