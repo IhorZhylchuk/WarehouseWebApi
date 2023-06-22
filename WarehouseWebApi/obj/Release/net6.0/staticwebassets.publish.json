@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "fWlQmw+NDSNs7cXYnOugJZrKjrx44GVSLLrm2i3bpu8=",
+  "Source": "WarehouseWebApi",
+  "BasePath": "_content/WarehouseWebApi",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

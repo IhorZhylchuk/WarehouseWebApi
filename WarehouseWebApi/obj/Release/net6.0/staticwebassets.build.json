@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "gti+R1bcFjNO4UUbTp8kN/gd5viXOXQsyxtZwOZ7pOM=",
+  "Source": "WarehouseWebApi",
+  "BasePath": "_content/WarehouseWebApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
