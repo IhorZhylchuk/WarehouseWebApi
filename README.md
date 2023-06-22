@@ -15,14 +15,14 @@ Navigate to the project directory and restore dependencies:
 ```cd YOUR_REPOSITORY```<br/>
 ```dotnet restore```<br/><br/>
 
-Open project in IDE, in ```appsettings.json``` entere you server name, run the following commands:<br/>
+Open project in IDE, in ```appsettings.json``` enter your server name, run the following commands:<br/>
 ```add-migration MIGRATION_NAME``` then run <br/>
 ```update-database```<br/>
 
-You can run the app by pressing the "Play" button in your IDE or by running the following command in the terminal:
+You can run Api by pressing the "Play" button in your IDE or by running the following command in the terminal:
 <br/>
 ```dotnet run```
 <br/><br/>
-To test the API, open browser and navigate to http://localhost:5000/swagger/index.html (the port number may be changed, when you run ```dotnet run``` command it will show which port is listening). This will bring the Swagger UI where you can expore the API endpoints
+To test the API, open browser and navigate to http://localhost:5000/swagger/index.html (the port number may be changed, when you run ```dotnet run``` command it will show which port is listening). This will bring the Swagger UI where you can expore the API endpoints.
 
 
