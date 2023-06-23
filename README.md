@@ -13,7 +13,7 @@ Clone this repository to your local machine:<br/>
 Navigate to the project directory and restore dependencies:
 <br/>
 ```cd YOUR_REPOSITORY```<br/>
-```dotnet restore```<br/><br/>
+```dotnet restore```<br/>
 
 Open project in IDE, in ```appsettings.json``` enter your server name, run the following commands:<br/>
 ```add-migration MIGRATION_NAME``` then run <br/>
